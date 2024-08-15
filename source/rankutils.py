@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-
-"""
-
-
 import math
 import numpy as np
 import mallows_kendall as mk
@@ -101,22 +94,6 @@ def average_inv_consensus(perms):
     return p
 
 
-#def graph_weight_consensus(perms):
-#    n = len(perms)
-#    m = len(perms[0])
-#    indegree = np.zeros(m)
-#    #print(m, n)
-#    for itrx in range(1,m+1,1):
-#        for itry in range(1,m+1,1):
-#            if(itrx == itry):
-#                continue
-#            for itrz in range(n):
-#                if(np.where(perms[itrz] == itrx)[0][0] < np.where(perms[itrz] == itry)[0][0]):
-#                    indegree[itrx-1]+=1
-#    indegree+=[random.uniform(10**(-7), 10**(-6)) for itr in range(m)]
-#    ranks = m+1-rankdata(indegree)
-#    return ranks
-
 def graph_weight_consensus(perms):
     '''
     
@@ -149,18 +126,6 @@ def graph_weight_consensus(perms):
     ranks = rankdata(indegree, method='ordinal')
     return ranks
 
-#def footrule_consensus(perms):
-#    n = len(perms)
-#    m = len(perms[0])
-#    bigraph = np.zeros((m,m))
-#    for itrx in range(1,m+1,1):
-#        for itry in range(1,m+1,1):
-#            for itrz in range(n):
-#                bigraph[itrx-1][itry-1]+= np.absolute(np.where(perms[itrz] == itrx)[0][0]+1 - itry)
-#                
-#    bigraph_csr = csr_matrix(bigraph)
-#    ranks = min_weight_full_bipartite_matching(bigraph_csr)[1] + 1
-#    return ranks
 
 def footrule_consensus(perms):
     '''
@@ -192,6 +157,17 @@ def footrule_consensus(perms):
     return ranks
 
 def perm_2_lehmer(p):
+    '''
+
+    Parameters
+    ----------
+    p: permutation 
+
+    Returns
+    -------
+    l : lehmer code
+
+    '''
     l = np.zeros(len(p))
     for itrx in range(len(p)):
         for itry in range(itrx):
@@ -200,6 +176,18 @@ def perm_2_lehmer(p):
     return l
 
 def lehmer_2_perm(l):
+    '''
+
+    Parameters
+    ----------
+    l : lehmer code
+
+    Returns
+    -------
+    p: permutation 
+    
+
+    '''
     remain = [itr for itr in range(len(l), 0, -1)]
     p = np.zeros(len(l))
     for itrx in range(len(l)-1, -1, -1):
@@ -207,34 +195,20 @@ def lehmer_2_perm(l):
         remain.remove(p[itrx])
     return p
 
-#def perm_2_lehmer(p):
-#    p_inv = np.zeros(len(p))
-#    for itrx in range(len(p)):
-#        p_inv[int(p[itrx])-1] = itrx+1
-#    #print(p_inv)
-#    l = np.zeros(len(p_inv))
-#    for itrx in range(len(p_inv)):
-#        for itry in range(itrx):
-#            if(p_inv[itry]>p_inv[itrx]):
-#                l[itrx]+=1       
-#    #print(l)
-#    return l
 
-#def lehmer_2_perm(l):
-#    #print(l)
-#    remain = [itr for itr in range(len(l), 0, -1)]
-#    p_inv = np.zeros(len(l))
-#    for itrx in range(len(l)-1, -1, -1):
-#        p_inv[itrx] = remain[int(l[itrx])]
-#        remain.remove(p_inv[itrx])
-#    #print(p_inv)
-#    p = np.zeros(len(p_inv))
-#    for itrx in range(len(p_inv)):
-#        p[int(p_inv[itrx])-1] = itrx+1
-#    #print(p)
-#    return p
 
 def lehmer_max_consensus(perms):
+    '''
+
+    Parameters
+    ----------
+    lehmer_perms: permutations to aggregate
+
+    Returns
+    -------
+    ranks : aggregate based on lehmer codes described in the paper
+
+    '''
     n = len(perms)
     m = len(perms[0])
     lehmer_perms = []
@@ -252,6 +226,17 @@ def lehmer_max_consensus(perms):
     return ranks
 
 def lehmer_max_consensus_l(lehmer_perms):
+    '''
+
+    Parameters
+    ----------
+    lehmer_perms: lehmer code of permutations to aggregate
+
+    Returns
+    -------
+    ranks : aggregate based on lehmer codes described in the paper
+
+    '''
     #in this version of the function, we input the lehmer code itself
     #it helps to speed up the code by ammortizing the cost of perm to lehmer
     n = len(lehmer_perms)
@@ -268,6 +253,19 @@ def lehmer_max_consensus_l(lehmer_perms):
     return ranks
 
 def calc_dist_from_aggregate(perms, agg_perm):
+    '''
+
+    Parameters
+    ----------
+    perms: permutations to calculate distance from
+    
+    agg_perm: aggregate or centroid permutation 
+
+    Returns
+    -------
+    dist : normalized average Kemeney distance
+
+    '''
     n = len(perms)
     m = len(perms[0])
     dist = 0
@@ -278,6 +276,22 @@ def calc_dist_from_aggregate(perms, agg_perm):
 
 
 def calc_threshold(phi=0.1, m=10, n=10000):
+    '''
+
+    Parameters
+    ----------
+    phi : scaling factor (0,1)
+        
+    m : length of permutations
+    
+    n: number of samples to generate
+
+    Returns
+    -------
+    thresh : bin threshold for quantized Borda
+
+    '''
+    
     sigma_0 = np.array(range(0,m,1))
     perms = mk.sample(m=n, n=m, phi=phi, s0=sigma_0)
     perms = np.array(perms)
@@ -289,8 +303,23 @@ def calc_threshold(phi=0.1, m=10, n=10000):
     return thresh
     
 def bin_average_consensus(perms, threshold):
+    '''
+
+    Parameters
+    ----------
+    perms : list of permutations
+        The permutations are in two-line notation
+        
+    threshold : list of thresholds as described in the paper
+
+    Returns
+    -------
+    ranks : permutation
+        Aggregate permutations based quantized Borda
+
+    '''
     avg_perm = np.mean(perms, axis=0)
-    #print(avg_perm)
+    
     ranks = np.zeros(len(avg_perm))
     
     for itr in range(len(avg_perm)):
@@ -302,10 +331,23 @@ def bin_average_consensus(perms, threshold):
                 break
         if flag:
             ranks[itr] = len(threshold)+1
-    #print(ranks)
+    
     return ranks
 
 def estimate_phi(perms):
+    '''
+    
+
+    Parameters
+    ----------
+    perms : list of permutations
+        The permutations are in two-line notation
+
+    Returns
+    -------
+    best_phi : optimal value of phi
+
+    '''
     m=len(perms[0])
     phi_list = [x/10 for x in range(1,10,1)]
     min_error = 100000
