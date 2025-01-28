@@ -1,5 +1,5 @@
 # FRA
-This is a repository for Federated Aggregation of Mallows Rankings: A Comparitive Analysis of Borda and Lehmer Coding.
+This is a repository for Federated Aggregation of Full Mallows Rankings: A Comparitive Analysis of Borda and Lehmer Coding.
 
 # Scripts
 
